@@ -5,14 +5,12 @@ import requests
 import random
 import json
 
-'''
 with open('creds.json','r') as saves:
 		creds = json.load(saves)
 		saves.close()
 
 discordToken = creds['discordToken']
-'''
-discordToken = 'MTM4NzU2OTAyNTUzMzM0NTg4Mg.GEd4bK.98c8gz5R4Y802GNROcJsni0F4RbVJZ7ghtnBtM'
+
 intent = discord.Intents.all()
 bot = discord.Bot(intents = intent)
 allCogs = ['lottery']
