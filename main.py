@@ -1,9 +1,7 @@
 import discord
-from discord import Intents
-from discord.ext import commands
-import requests
-import random
+
 import json
+from os.path import exists
 
 with open('creds.json','r') as saves:
 		creds = json.load(saves)
@@ -18,6 +16,10 @@ allCogs = ['lottery']
 @bot.event
 async def on_ready():
 	print("Ready\n----------------------------")
+	if not exists('saves.json'):
+		with open('saves.json','w') as saves:
+			json.dump({'members': [{'id': 0, 'name': 'Rick Astley', 'coupons':0}]},saves,indent=4)
+			saves.close()
 	
 @bot.command(description = 'Not for you to use')
 async def reload(ctx, extension = None):
