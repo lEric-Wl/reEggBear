@@ -14,10 +14,12 @@ class Economy(commands.Cog):
     def load_saves(self):
         with open(self.saves_file, 'r') as saves:
             self.saves = json.load(saves)
+            saves.close()
 
     def save_saves(self):
         with open(self.saves_file, 'w') as saves:
             json.dump(self.saves, saves, indent=4)
+        self.load_saves()
 
     def add_member(self, memberId):
         if memberId not in self.saves['members']:
