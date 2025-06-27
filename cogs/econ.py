@@ -54,17 +54,18 @@ class Economy(commands.Cog):
         return balance
 
     @commands.slash_command()
-    async def check_balance(self, ctx):  
-        print('received')       
-        member = ctx.author.id
+    async def check_balance(self, ctx, user: discord.User = None):  
+        if user is None:
+            user = ctx.author      
+        member = user.id
         
         balance = self.getBalance(str(member))
 
         embed = discord.Embed(
-            title=f'Currency Balances for {ctx.author.name}',
+            title=f'Currency Balances for {user.display_name}',
         )
 
-        embed.set_thumbnail(url=ctx.author.display_avatar.url)
+        embed.set_thumbnail(url=user.display_avatar.url)
         embed.add_field(name=f'**Holding:** {balance[0]} Hello Fresh Coupons \n**Bank:** {balance[1]} Hello Fresh Coupons',value='')
         embed.set_footer(text='Hello Fresh Coupons in the Bank earn interest!')
 
