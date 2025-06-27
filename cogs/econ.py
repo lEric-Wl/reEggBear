@@ -3,6 +3,7 @@ from discord.ext import commands
 
 import json
 import random
+import time
 
 class Economy(commands.Cog):
     def __init__(self, bot):
@@ -162,10 +163,22 @@ class Economy(commands.Cog):
     async def daily(self,ctx):
         member = str(ctx.author.id)
 
-        self.getBalance(member)[0] += 500
-        embed = discord.Embed(            
-            description="You've claimed you daily bonus!\nRecieved 500 Hello Fresh Coupons"
-        )
+        timestamp = int(time.time())
+
+        if member not in self.saves['daily'] or self.saves['daily'][member] <= timestamp:
+            self.getBalance(member)[0] += 500
+            embed = discord.Embed(            
+                description="You've claimed you daily bonus!\nRecieved 500 Hello Fresh Coupons"
+            )
+
+            self.saves['daily'][member] = timestamp + 86400
+        else:
+            embed = discord.Embed(
+                title="You are on cooldown!",
+                description=f"Please try again in <t:{self.saves['daily'][member]}:R>"
+            )
+            
+            embed.set_footer(text=f'Daily Bonus - {ctx.author.display_name}')
 
         self.save_saves()
         await ctx.respond(embed=embed)
