@@ -15,12 +15,16 @@ bot = discord.Bot(intents = intent)
 allCogs = ['lottery','econ']
 
 @bot.event
-async def on_ready():
-	print("Ready\n----------------------------")
+async def on_connect():
 	if not exists('saves.json'):
 		with open('saves.json','w') as saves:
-			json.dump({'members': {"0":[0,0]}},saves,indent=4)
+			json.dump({'members': {},'lottery':{}},saves,indent=4)
 			saves.close()
+
+@bot.event
+async def on_ready():
+	print("Ready\n----------------------------")
+
 	
 @bot.command(description = 'Not for you to use')
 async def reload(ctx, extension = None):
@@ -53,6 +57,11 @@ async def ping(ctx):
 	print("recived")
 
 for stuff in allCogs:
+	if not exists('saves.json'):
+		with open('saves.json','w') as saves:
+			json.dump({'members': {},'lottery':{}},saves,indent=4)
+			saves.close()
+
 	bot.load_extension(f'cogs.{stuff}')	
 	
 bot.run(discordToken)
