@@ -1,6 +1,7 @@
 import discord
 
 import json
+import os
 from os.path import exists
 
 with open('creds.json','r') as saves:
@@ -11,14 +12,14 @@ discordToken = creds['discordToken']
 
 intent = discord.Intents.all()
 bot = discord.Bot(intents = intent)
-allCogs = ['lottery']
+allCogs = ['lottery','econ']
 
 @bot.event
 async def on_ready():
 	print("Ready\n----------------------------")
 	if not exists('saves.json'):
 		with open('saves.json','w') as saves:
-			json.dump({'members': {"0":0}},saves,indent=4)
+			json.dump({'members': {"0":[0,0]}},saves,indent=4)
 			saves.close()
 	
 @bot.command(description = 'Not for you to use')

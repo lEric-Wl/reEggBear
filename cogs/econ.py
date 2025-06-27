@@ -21,12 +21,13 @@ class Economy(commands.Cog):
 
     def add_member(self, memberId):
         if memberId not in self.saves['members']:
-            self.saves['members'][memberId] = 0
+            self.saves['members'][memberId] = [0,0] #Holding, Bank
             self.save_saves()
 
     def check_member(self, memberId):
-        if(self.bot.get_user(int(memberId)).bot):
-            return
+        user = self.bot.get_user(int(memberId))
+        if user is None or user.bot:
+            return 
         
         if memberId not in self.saves['members']:
             self.add_member(memberId)
@@ -43,23 +44,45 @@ class Economy(commands.Cog):
         member = str(message.author.id)
 
         self.check_member(member)
-        self.saves['members'][member] += random.randint(5, 20) 
+        self.saves['members'][member][0] += random.randint(5, 20) 
         self.save_saves()
 
-    @discord.slash_command()
-    async def check_balance(self, ctx):         
+    def getBalance(self, memberId):
+        self.check_member(memberId)
+        balance = self.saves['members'][memberId]
+
+        return balance
+
+    @commands.slash_command()
+    async def check_balance(self, ctx):  
+        print('received')       
         member = ctx.author.id
-        self.check_member(member)
-        balance = self.saves['members'][member]
+        
+        balance = self.getBalance(str(member))
 
         embed = discord.Embed(
             title=f'Currency Balances for {ctx.author.name}',
         )
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
-        embed.add_field(name=f'**Holding:** {balance} Hello Fresh Coupons',value='')
+        embed.add_field(name=f'**Holding:** {balance[0]} Hello Fresh Coupons',value='')
 
         await ctx.respond(embed=embed)
 
+    @discord.slash_command()
+    async def deposit(self,ctx,amount:int):
+        member = str(ctx.author.id)
+
+        if amount > self.getBalance(member)[0]:
+            await ctx.respond("You don't have that much, dingus")
+
+        self.getBalance(member)[1] += amount
+        self.getBalance(member)[0] -= amount
+
+        embed  = discord.Embed(
+            title=f"You've successfully deposited {amount} Hello Fresh Coupons into your bank!"
+        )
+
+        await ctx.respond(embed = embed)
 
 def setup(bot):
     bot.add_cog(Economy(bot))
