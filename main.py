@@ -18,7 +18,7 @@ async def on_ready():
 	print("Ready\n----------------------------")
 	if not exists('saves.json'):
 		with open('saves.json','w') as saves:
-			json.dump({'members': [{'id': 0, 'name': 'Rick Astley', 'coupons':0}]},saves,indent=4)
+			json.dump({'members': {0:0}},saves,indent=4)
 			saves.close()
 	
 @bot.command(description = 'Not for you to use')

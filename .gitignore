@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+creds.json
+createCreds.py
+saves.json
