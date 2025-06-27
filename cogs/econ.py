@@ -85,6 +85,7 @@ class Economy(commands.Cog):
             title=f"You've successfully deposited {amount} Hello Fresh Coupons into your bank!"
         )
 
+        self.save_saves
         await ctx.respond(embed = embed)
         
     @discord.slash_command()
@@ -101,45 +102,57 @@ class Economy(commands.Cog):
             title=f"You've successfully withdrawn {amount} Hello Fresh Coupons from your bank!"
         )
 
+        self.save_saves
         await ctx.respond(embed = embed)
 
     @discord.slash_command()
     async def rob(self,ctx,user: discord.User):
+        if user.bot:
+            balance = self.getBalance(str(ctx.author.id))
+            balance[0] -= 500
+            ctx.respond(f"{ctx.author.mention}, you can't rob a bot! Egg Bear fines you 500 coupons. Be better.")
+            self.save_saves()
+            return
+
         target = str(user.id)
-        author = str(ctx.message.author.id)
+        author = str(ctx.author.id)
 
         if target == author:
             await ctx.respond("You can't rob yourself, dingus!")
+            return 
         
         target_balance = self.getBalance(target)
         author_balance = self.getBalance(author)
         
         if target_balance[0] < 200:
-            fine = (int(random.randint(1, 5)/100)) * target_balance[0]
+            fine = int((random.randint(1, 5)/100) * target_balance[0])
             print(fine)
             author_balance[0] -= fine
             await ctx.respond(f"{ctx.author.mention} tried to rob a poor person. That's just rude. Egg Bear fines you {fine} coupons.")
+            self.save_saves()
+            return
 
         rng = random.randint(0, 100)
+        print(rng)
         if rng < 30: #Rob failed
-            ctx.repsond(f'{ctx.author.mention} tried to rob {user.mention}, but failed.')
+            await ctx.respond(f'{ctx.author.mention} tried to rob {user.mention}, but failed.')
         elif rng < 50: #got caught
-            fine = (int(random.randint(1, 5)/100)) * target_balance[0]
+            fine = int((random.randint(1, 5)/100) * target_balance[0])
             author_balance[0] -= fine
             target_balance[0] += fine
             await ctx.respond(f"{ctx.author.mention} tried to rob {user.mention} but got caught in the act! Egg Bear gines you {fine} coupons for you thievery, with the coupons being granted to your victim.")
         elif rng < 95: #Success, tazzar!
-            amount = random.randint(10,20)
+            amount = int((random.randint(10, 20)/100) * target_balance[0])
             author_balance[0] += amount
             target_balance[0] -= amount
-            ctx.respond(f'{ctx.author.mention} succeeded in stealing {amount} from {user.mention} and got {amount}!')
-        else: #mega success
-            amount = random.randint(20,50)
+            await ctx.respond(f'{ctx.author.mention} succeeded in stealing {amount} from {user.mention}')
+        else: #mega success, tazzaarr!!
+            amount = int((random.randint(20, 50)/100) * target_balance[0])
             author_balance[0] += amount
             target_balance[0] -= amount
-            ctx.respond(f'{ctx.author.mention} succeeded in stealing {amount} from {user.mention} and got {amount}!')
+            await ctx.respond(f'{ctx.author.mention} succeeded in stealing {amount} from {user.mention}')
         
-
+        self.save_saves()
 
 
 def setup(bot):
