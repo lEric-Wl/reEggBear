@@ -27,6 +27,7 @@ class View(discord.ui.View):
             self.save_saves()
 
     def check_member(self, memberId):
+        self.load_saves()
         user = self.bot.get_user(int(memberId))
         if user is None or user.bot:
             return 
