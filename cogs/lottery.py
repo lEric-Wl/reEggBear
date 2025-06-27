@@ -17,7 +17,6 @@ class Lottery(commands.Cog):
     async def lottery(self, ctx):
         thumbnail = discord.File('./gamblingMeme.jpeg',filename='image.jpeg')
 
-
         embed = discord.Embed(
             title='Egg Bear Lottery!',
             description=f'''

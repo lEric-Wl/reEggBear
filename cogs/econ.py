@@ -154,6 +154,18 @@ class Economy(commands.Cog):
         
         self.save_saves()
 
+    @discord.slash_command()
+    async def daily(self,ctx):
+        member = str(ctx.author.id)
+
+        self.getBalance(member)[0] += 500
+        embed = discord.Embed(            
+            description="You've claimed you daily bonus!\nRecieved 500 Hello Fresh Coupons"
+        )
+
+        self.save_saves()
+        await ctx.respond(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))
