@@ -8,37 +8,10 @@ import time
 class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.saves_file = 'saves.json'
-        self.saves = None
-        self.load_saves()
-
-    def load_saves(self):
-        with open(self.saves_file, 'r') as saves:
-            self.saves = json.load(saves)
-            saves.close()
-
-    def save_saves(self):
-        with open(self.saves_file, 'w') as saves:
-            json.dump(self.saves, saves, indent=4)
-        self.load_saves()
-
-    def add_member(self, memberId):
-        if memberId not in self.saves['members']:
-            self.saves['members'][memberId] = [0,0] #Holding, Bank
-            self.save_saves()
-
-    def check_member(self, memberId):
-        self.load_saves()
-        user = self.bot.get_user(int(memberId))
-        if user is None or user.bot:
-            return 
         
-        if memberId not in self.saves['members']:
-            self.add_member(memberId)
-
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        self.check_member(str(member.id))
+        self.bot.file_manager.check_member(str(member.id))
             
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -47,13 +20,13 @@ class Economy(commands.Cog):
         
         member = str(message.author.id)
 
-        self.check_member(member)
-        self.saves['members'][member][0] += random.randint(5, 20) 
-        self.save_saves()
+        self.bot.file_manager.check_member(member)
+        self.bot.file_manager.saves['members'][member][0] += random.randint(5, 20) 
+        self.bot.file_manager.save_saves()
 
     def getBalance(self, memberId):
-        self.check_member(memberId)
-        balance = self.saves['members'][memberId]
+        self.bot.file_manager.check_member(memberId)
+        balance = self.bot.file_manager.saves['members'][memberId]
 
         return balance
 
@@ -82,15 +55,17 @@ class Economy(commands.Cog):
 
         if amount > self.getBalance(member)[0]:
             await ctx.respond("You don't have that much, dingus")
+            return
 
-        self.getBalance(member)[1] += amount
-        self.getBalance(member)[0] -= amount
+        balance = self.getBalance(member)
+        balance[1] += amount
+        balance[0] -= amount
 
         embed  = discord.Embed(
             title=f"You've successfully deposited {amount} Hello Fresh Coupons into your bank!"
         )
 
-        self.save_saves
+        self.bot.file_manager.save_saves()
         await ctx.respond(embed = embed)
         
     @discord.slash_command()
@@ -99,15 +74,17 @@ class Economy(commands.Cog):
 
         if amount > self.getBalance(member)[1]:
             await ctx.respond("You don't have that much in the bank, dingus")
-
-        self.getBalance(member)[0] += amount
-        self.getBalance(member)[1] -= amount
+            return 
+        
+        balance = self.getBalance(member)
+        balance[0] += amount
+        balance[1] -= amount
 
         embed  = discord.Embed(
             title=f"You've successfully withdrawn {amount} Hello Fresh Coupons from your bank!"
         )
 
-        self.save_saves
+        self.bot.file_manager.save_saves()
         await ctx.respond(embed = embed)
 
     @discord.slash_command()
@@ -116,7 +93,7 @@ class Economy(commands.Cog):
             balance = self.getBalance(str(ctx.author.id))
             balance[0] -= 500
             ctx.respond(f"{ctx.author.mention}, you can't rob a bot! Egg Bear fines you 500 coupons. Be better.")
-            self.save_saves()
+            self.bot.file_manager.save_saves()
             return
 
         target = str(user.id)
@@ -134,7 +111,7 @@ class Economy(commands.Cog):
             print(fine)
             author_balance[0] -= fine
             await ctx.respond(f"{ctx.author.mention} tried to rob a poor person. That's just rude. Egg Bear fines you {fine} coupons.")
-            self.save_saves()
+            self.bot.file_manager.save_saves()
             return
 
         rng = random.randint(0, 100)
@@ -164,14 +141,17 @@ class Economy(commands.Cog):
         member = str(ctx.author.id)
 
         timestamp = int(time.time())
+        
+        self.bot.file_manager.check_member(member)
+        saves = self.bot.file_manager.saves['timer']['daily']
 
-        if member not in self.saves['daily'] or self.saves['daily'][member] <= timestamp:
+        if member not in saves or saves[member] <= timestamp:
             self.getBalance(member)[0] += 500
             embed = discord.Embed(            
                 description="You've claimed you daily bonus!\nRecieved 500 Hello Fresh Coupons"
             )
 
-            self.saves['daily'][member] = timestamp + 86400
+            saves[member] = timestamp + 86400
         else:
             embed = discord.Embed(
                 title="You are on cooldown!",
@@ -180,7 +160,7 @@ class Economy(commands.Cog):
             
             embed.set_footer(text=f'Daily Bonus - {ctx.author.display_name}')
 
-        self.save_saves()
+        self.bot.file_manager.save_saves()
         await ctx.respond(embed=embed)
 
 

@@ -8,77 +8,44 @@ import random
 class View(discord.ui.View):
     def __init__(self,bot):
         super().__init__(timeout=None)  # Set timeout to None so the view is permanent
-        self.saves_file = 'saves.json'
-        self.saves = None
-        self.load_saves()
         self.bot=bot
-
-    def load_saves(self):
-        with open(self.saves_file, 'r') as saves:
-            self.saves = json.load(saves)
-            saves.close()
-
-    def save_saves(self):
-        with open(self.saves_file, 'w') as saves:
-            json.dump(self.saves, saves, indent=4)
-        self.load_saves()
-
-    def add_member(self, memberId):
-        if memberId not in self.saves['members']:
-            self.saves['members'][memberId] = [0,0] #Holding, Bank
-            self.save_saves()
-
-    def check_member(self, memberId):
-        self.load_saves()
-        user = self.bot.get_user(int(memberId))
-        if user is None or user.bot:
-            return 
-        
-        if memberId not in self.saves['members']:
-            self.add_member(memberId)
+        for i in [1,5,10]:
+            self.add_item(self.make_buttons(i))
 
     def buy_ticket(self, memberId, amount):
-        self.load_saves()
-        self.check_member(memberId)
-        if memberId not in self.saves['lottery']:
-            self.saves['lottery'][memberId] = 0
+        self.bot.file_manager.check_member(memberId)
+        saves = self.bot.file_manager.saves
+
+        if memberId not in saves['lottery']:
+            saves['lottery'][memberId] = 0
         
-        if self.saves['members'][memberId][0] < amount * 100:
+        if saves['members'][memberId][0] < amount * 100:
             return False
-        self.saves['lottery'][memberId] += amount
-        self.saves['lottery']['total'] += amount
-        self.saves['members'][memberId][0] -= amount * 100
-        self.save_saves()
+        
+        saves['lottery'][memberId] += amount
+        saves['lottery']['total'] += amount
+        saves['members'][memberId][0] -= amount * 100
+        self.bot.file_manager.save_saves()
 
         return True
         
+    def make_buttons(self,amount):
+        button = discord.ui.Button(
+                label=f"{amount} ticket{'s' if amount > 1 else ''}",
+                style=discord.ButtonStyle.green,
+                custom_id=f"{amount}ticket{'s' if amount > 1 else ''}"
+        )    
+        
+        async def callback(interaction):
+            member = str(interaction.user.id)
+            buy = self.buy_ticket(member, amount)
+            if not buy:
+                await interaction.respond("You don't have enough coupons", ephemeral=True)
+            else: 
+                await interaction.respond(f"You successfully bought {amount} ticket{'s' if amount > 1 else ''}", ephemeral=True)
 
-    @discord.ui.button(label='1 ticket',style=discord.ButtonStyle.primary, custom_id='1ticket')
-    async def callback1(self,button,interaction):
-        member = str(interaction.user.id)
-        buy = self.buy_ticket(member,1)
-        if not buy:
-           await interaction.respond("You don't have enough coupons",ephemeral=True)
-        else: 
-            await interaction.respond("You successfully bought 1 ticket",ephemeral=True)
-
-    @discord.ui.button(label='5 tickets',style=discord.ButtonStyle.primary, custom_id='5tickets')
-    async def callback5(self,button,interaction):
-        member = str(interaction.user.id)
-        buy = self.buy_ticket(member,5)
-        if not buy:
-           await interaction.respond("You don't have enough coupons",ephemeral=True)
-        else: 
-            await interaction.respond("You successfully bought 5 ticket",ephemeral=True)
-
-    @discord.ui.button(label='10 tickets',style=discord.ButtonStyle.primary, custom_id='10tickets')
-    async def callback10(self,button,interaction):
-        member = str(interaction.user.id)
-        buy = self.buy_ticket(member,10)
-        if not buy:
-           await interaction.respond("You don't have enough coupons",ephemeral=True)
-        else: 
-            await interaction.respond("You successfully bought 10 ticket",ephemeral=True)
+        button.callback = callback
+        return button
 
 class Lottery(commands.Cog):
     def __init__(self, bot):
@@ -88,6 +55,8 @@ class Lottery(commands.Cog):
         self.saves_file = 'saves.json'
         self.saves = None
         self.load_saves()
+
+        self.message = None
 
     def load_saves(self):
         with open(self.saves_file, 'r') as saves:
@@ -126,7 +95,7 @@ class Lottery(commands.Cog):
             description=f'''
             Enter to win some Hello Fresh coupons!
 
-            Each ticket costs 100 coupons. Winners will be selected every day at 20:00 UTC +0.
+            Each ticket costs 100 coupons. Winners will be selected every day at 18:00 UTC +0.
             
             The current jackpot is **1100 coupons!**
             '''
@@ -134,16 +103,16 @@ class Lottery(commands.Cog):
 
         embed.set_thumbnail(url='attachment://image.jpeg')
 
-        await ctx.respond(embed=embed,file=thumbnail,view=View(self.bot))
+        self.message = await ctx.respond(embed=embed,file=thumbnail,view=View(self.bot))
 
-    @tasks.loop(time=datetime.time(hour=20,minute=0, tzinfo=datetime.timezone.utc))
+    @tasks.loop(time=datetime.time(hour=18,minute=0, tzinfo=datetime.timezone.utc))
     async def get_winner(self):
         channel = self.bot.get_channel(1380610958350618786)
         image = discord.File('./lotteryWinner.gif',filename='image.gif')
 
-        self.load_saves()
+        self.bot.file_manager.load_saves()
 
-        lottery = self.saves['lottery']
+        lottery = self.bot.file_manager.saves['lottery']
         totalTickets = lottery['total']
 
         if totalTickets == 0:
@@ -169,10 +138,10 @@ class Lottery(commands.Cog):
             if rng <= 0:
                 winner = stuff
                 self.check_member(winner)
-                self.saves['members'][winner][0] += prize
+                self.bot.file_manager.saves['members'][winner][0] += prize
                 
-                self.saves['lottery'] = {'total': 0}  # Reset the lottery
-                self.save_saves()
+                lottery = {'total': 0}  # Reset the lottery
+                self.bot.file_manager.save_saves()
                 break
 
 
