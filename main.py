@@ -72,6 +72,19 @@ async def reload(ctx, extension=None):
     except Exception as e:
         await ctx.respond(f"Unexpected error: {str(e)}", ephemeral=True)
 
+'''
+@bot.command(description='Not for you to use')
+async def reload(ctx, extension=None):
+    await ctx.defer(ephemeral=True)
+    if not await bot.is_owner(ctx.author):
+        print(f"{ctx.author} tried to use the reload command")
+        await ctx.respond('I told you in the description this is not for you to use, you Dingus!')
+        return
+    try:
+        
+        if extension is not None:
+'''
+
 @bot.command()
 async def ping(ctx):
     await ctx.respond(f"Pong! Latency is {bot.latency}")
