@@ -5,7 +5,7 @@ from os.path import exists
 
 if not exists('saves.json'):
     with open('saves.json', 'w') as saves:
-        json.dump({'members': {}, 'lottery': {},'timer':{},'dne':{}}, saves, indent=4)
+        json.dump({'members': {}, 'lottery': {},'timer':{"daily":{},"dne":{}},'dne':{}}, saves, indent=4)
 
 with open('creds.json', 'r') as creds_file:
     creds = json.load(creds_file)
@@ -14,7 +14,7 @@ discordToken = creds['discordToken']
 
 intent = discord.Intents.all()
 bot = discord.Bot(intents=intent)
-allCogs = ['lottery', 'econ','dne']
+allCogs = ['lottery', 'econ', 'dne']
 
 @bot.event
 async def on_ready():

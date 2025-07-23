@@ -1,14 +1,13 @@
 import discord
 from discord.ext import commands
 
-import json
 import random
 import time
 
 class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
         self.bot.file_manager.check_member(str(member.id))
@@ -151,11 +150,11 @@ class Economy(commands.Cog):
                 description="You've claimed you daily bonus!\nRecieved 500 Hello Fresh Coupons"
             )
 
-            saves[member] = timestamp + 86400
+            self.bot.file_manager.saves['timer']['daily'][member] = timestamp + 86400
         else:
             embed = discord.Embed(
                 title="You are on cooldown!",
-                description=f"Please try again in <t:{self.saves['daily'][member]}:R>"
+                description=f"Please try again in <t:{saves[member]}:R>"
             )
             
             embed.set_footer(text=f'Daily Bonus - {ctx.author.display_name}')
