@@ -75,10 +75,6 @@ class DNE(commands.Cog):
         datetime.time(hour=13, minute=0, tzinfo=datetime.timezone.utc),
         datetime.time(hour=21, minute=0, tzinfo=datetime.timezone.utc)
     ])
-    async def temp(self):
-        return 
-    
-    @discord.slash_command()
     async def monster(self,ctx):
         await ctx.respond(f'<@&1387579469749030934> warriors! A new foe approaches. Band together to defeat it!')
 
