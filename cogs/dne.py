@@ -12,7 +12,7 @@ class View(discord.ui.View):
         self.monster = monster
         
 
-    @discord.ui.button(label="Attack!", style=discord.ButtonStyle.red, custom="attack")
+    @discord.ui.button(label="Attack!", style=discord.ButtonStyle.red, custom_id="attack")
     async def attack(self, button, interaction):
         self.bot.file_manager.load_saves()
     
