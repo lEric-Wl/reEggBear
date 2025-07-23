@@ -34,7 +34,6 @@ class View(discord.ui.View):
             self.bot.file_manager.saves['timer']['dne'][member] = timestamp + 900 #15 min
             self.bot.file_manager.saves['dne']['monsters'][message] -= attack
             self.bot.file_manager.saves['members'][member][0] += coupons
-            self.bot.file_manager.save_saves()
             await interaction.response.send_message(f'Glory be! <@{member}> smote the {self.monster} for {attack} HP, and gained {coupons} coupons!')
 
             if self.bot.file_manager.saves['dne']['monsters'][message] <= 0:
@@ -77,6 +76,29 @@ class DNE(commands.Cog):
         embed.set_image(url='attachment://image.png')
         await channel.send(embed=embed, file=image, view=View(self.bot,monster))
         return
+
+    @commands.slash_command(description='Rizz')
+    async def rizz(self,ctx,target):
+        atk_rng = random.randint(1,20)
+        def_rng = random.randint(1,20)
+
+        if def_rng == 20:
+            message = f'<@{ctx.author.id}> tried to rizz <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. Your words fall on deaf ears.'
+            image = discord.File('./rizzfail.jpg', filename='image.png')
+        elif atk_rng > def_rng:
+            message = f'<@{ctx.author.id}> rizzed <@{target.id}>. What a simp!'
+            image = discord.File('./chad.jpg', filename='image.png')
+        else:
+            message = f"<@{ctx.author.id}> tried to rizz <@{target.id}> but they aren't falling for those cheesy lines. You are shot down!"
+            image = discord.File('./rizzfail.jpg', filename='image.png')
+
+        embed = discord.Embed(
+            title='Rizz!!!',
+            description=message
+        )
+        embed.set_image(url='attachment://image.png')
+
+        await ctx.respond(embed=embed, file=image)
 
 def setup(bot):
     bot.add_cog(DNE(bot))
