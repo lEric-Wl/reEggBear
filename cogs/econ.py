@@ -91,7 +91,7 @@ class Economy(commands.Cog):
         if user.bot:
             balance = self.getBalance(str(ctx.author.id))
             balance[0] -= 500
-            ctx.respond(f"{ctx.author.mention}, you can't rob a bot! Egg Bear fines you 500 coupons. Be better.")
+            await ctx.respond(f"{ctx.author.mention}, you can't rob a bot! Egg Bear fines you 500 coupons. Be better.")
             self.bot.file_manager.save_saves()
             return
 

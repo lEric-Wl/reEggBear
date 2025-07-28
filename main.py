@@ -45,10 +45,11 @@ class FileManager:
         self.load_saves()
         if self.bot:
             user = self.bot.get_user(int(memberId))
-            if user is None or user.bot:
+            if user is None:
                 return 
         if memberId not in self.saves['members']:
             self.add_member(memberId)
+            self.save_saves()
 
 bot.file_manager = FileManager(bot)
 

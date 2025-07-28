@@ -29,6 +29,7 @@ class View(discord.ui.View):
         attack = random.randint(150, 250)
         coupons = random.randint(100, 250)
 
+        print(member)
         self.bot.file_manager.check_member(member)
         timer = save[1]
 
@@ -61,6 +62,7 @@ class PVPView(discord.ui.View):
     @discord.ui.button(label="Grab Coupons!", style=discord.ButtonStyle.green, custom_id="attack")
     async def take(self,button,interaction):
         self.bot.file_manager.check_member(str(interaction.user.id))
+        print('target',self.target.id)
         self.bot.file_manager.check_member(str(self.target.id))
 
         self.bot.file_manager.saves['members'][str(self.target.id)][0] -= self.coupons
@@ -104,6 +106,7 @@ class DNE(commands.Cog):
         return
 
     def pvp(self):
+        #return 2 #testing
         def_rng = random.randint(1,20)
         atk_rng = random.randint(1,20)
         
@@ -118,133 +121,147 @@ class DNE(commands.Cog):
     def check_channel(self,name):
         return 'battle-arena' in name.lower() or 'dne' in name.lower()
 
+    def check_cooldown(self, member):
+        self.bot.file_manager.load_saves()
+        timestamp = int(time.time())
+        if 'pvp' not in self.bot.file_manager.saves['timer']:
+            self.bot.file_manager.saves['timer']['pvp'] = {}
+            self.bot.file_manager.save_saves()
+
+        if member not in self.bot.file_manager.saves['timer']['pvp'] or self.bot.file_manager.saves['timer']['pvp'][member] <= timestamp:
+            self.bot.file_manager.saves['timer']['pvp'][member] = timestamp + 3 #3 seconds cooldown
+            self.bot.file_manager.save_saves()
+            return 1
+        return 0
+
     @commands.slash_command(description='Rizz')
     async def rizz(self, ctx, target: discord.User):
         self.bot.file_manager.check_member(str(ctx.author.id))
         self.bot.file_manager.check_member(str(target.id))  
 
-        if ctx.author.id == target.id:
-            await ctx.respond("You can't rizz yourself, you dingus!")
-            return
-
         if not self.check_channel(ctx.channel.name):
             await ctx.respond("Go to the battle arena channel, you nerd!")
             return
         
-        rng = self.pvp()
-        if rng == -1:
-            message = f'<@{ctx.author.id}> tried to rizz <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. Your words fall on deaf ears.'
-            image = discord.File('./rizzfail.jpg', filename='image.png')
-        elif rng == 0:
-            message = f"<@{ctx.author.id}> tried to rizz <@{target.id}> but they aren't falling for those cheesy lines. You are shot down!"
-            image = discord.File('./rizzfail.jpg', filename='image.png')
-        elif rng == 1:
-            message = f'<@{ctx.author.id}> rizzed <@{target.id}>. What a simp!'
-            image = discord.File('./chad.jpg', filename='image.png')
-        elif rng == 2:
-            coupons = random.randint(100,500)
-            message = f"<@{ctx.author.id}> rizzed <@{target.id}> and because they're such a simp they tossed {coupons} of their Hello Fresh coupons at your feet; quick pick it up!"
-            image = discord.File('./chad.jpg', filename='image.png')
-            view = PVPView(self.bot, target, coupons)
-            embed = discord.Embed(
-                title='Rizz!!!',
-                description=message
-            )
-            embed.set_image(url='attachment://image.png')
-            await ctx.respond(embed=embed, file=image, view=view)
+        if ctx.author.id == target.id:
+            await ctx.respond("You can't rizz yourself, you dingus!")
             return
+        title = 'Rizz!!!'
+        view = None
+        if not self.check_cooldown(str(ctx.author.id)):
+            title = "Oops! How embarassing!"
+            message = f"Woah there <@{ctx.author.id}>, you aren't made of endless stamina! You can't \"perform\" at this moment....\n\nTry again in 10 seconds."
+            image = discord.File('./rizzfail.jpg', filename='image.png')
+        else:
+            rng = self.pvp()
+            if rng == -1:
+                message = f'<@{ctx.author.id}> tried to rizz <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. Your words fall on deaf ears.'
+                image = discord.File('./rizzfail.jpg', filename='image.png')
+            elif rng == 0:
+                message = f"<@{ctx.author.id}> tried to rizz <@{target.id}> but they aren't falling for those cheesy lines. You are shot down!"
+                image = discord.File('./rizzfail.jpg', filename='image.png')
+            elif rng == 1:
+                message = f'<@{ctx.author.id}> rizzed <@{target.id}>. What a simp!'
+                image = discord.File('./chad.jpg', filename='image.png')
+            elif rng == 2:
+                coupons = random.randint(100,500)
+                message = f"<@{ctx.author.id}> rizzed <@{target.id}> and because they're such a simp they tossed {coupons} of their Hello Fresh coupons at your feet; quick pick it up!"
+                image = discord.File('./chad.jpg', filename='image.png')
+                view = PVPView(self.bot, target, coupons)
 
         embed = discord.Embed(
-            title='Rizz!!!',
+            title=title,
             description=message
         )
         embed.set_image(url='attachment://image.png')
-        await ctx.respond(embed=embed, file=image)
+        await ctx.respond(embed=embed, file=image,view=view)
 
     @commands.slash_command(description='Fireball')
     async def fireball(self, ctx, target: discord.User):
         self.bot.file_manager.check_member(str(ctx.author.id))
         self.bot.file_manager.check_member(str(target.id))
 
-        if ctx.author.id == target.id:
-            await ctx.respond("You can't fireball yourself, you dingus!")
-            return
-
         if not self.check_channel(ctx.channel.name):
             await ctx.respond("Go to the battle arena channel, you nerd!")
             return
-
-        rng = self.pvp()
-        if rng == -1:
-            message = f'<@{ctx.author.id}> tried to cast fireball at <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. The fireball landed at their feet; you missed!'
-            image = discord.File('./fireballfail.jpg', filename='image.png')
-        elif rng == 0:
-            message = f"<@{ctx.author.id}> tried to cast fireball at <@{target.id}> in a small area. It backfired. Burn!"
-            image = discord.File('./fireballfail.jpg', filename='image.png')
-        elif rng == 1:
-            message = f'<@{ctx.author.id}> hit <@{target.id}> with a fireball. Good shot!'
-            image = discord.File('./gandalf.jpg', filename='image.png')
-        elif rng == 2:
-            coupons = random.randint(100,500)
-            message = f"<You fireballed <@{target.id}> and because you threw such an epic shot, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
-            image = discord.File('./gandalf.jpg', filename='image.png')
-            view = PVPView(self.bot, target, coupons)
-            embed = discord.Embed(
-                title='Fireball Throw',
-                description=message
-            )
-            embed.set_image(url='attachment://image.png')
-            await ctx.respond(embed=embed, file=image, view=view)
+        
+        if ctx.author.id == target.id:
+            await ctx.respond("You can't fireball yourself, you dingus!")
             return
+        
+        title = 'Fireball Throw'
+        view = None
+        if not self.check_cooldown(str(ctx.author.id)):
+            title = "Oops! How embarassing!"
+            message = f"Sorry <@{ctx.author.id}>, you don'thave a spell slot to cast fireball right now, why don't you take a long rest...\n\nTry again in 30 seconds."
+            image = discord.File('./fireballfail.jpg', filename='image.png')
+        else:
+            rng = self.pvp()
+            if rng == -1:
+                message = f'<@{ctx.author.id}> tried to cast fireball at <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. The fireball landed at their feet; you missed!'
+                image = discord.File('./fireballfail.jpg', filename='image.png')
+            elif rng == 0:
+                message = f"<@{ctx.author.id}> tried to cast fireball at <@{target.id}> in a small area. It backfired. Burn!"
+                image = discord.File('./fireballfail.jpg', filename='image.png')
+            elif rng == 1:
+                message = f'<@{ctx.author.id}> hit <@{target.id}> with a fireball. Good shot!'
+                image = discord.File('./gandalf.jpg', filename='image.png')
+            elif rng == 2:
+                coupons = random.randint(100,500)
+                message = f"<You fireballed <@{target.id}> and because you threw such an epic shot, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
+                image = discord.File('./gandalf.jpg', filename='image.png')
+                view = PVPView(self.bot, target, coupons)
 
         embed = discord.Embed(
-            title='Fireball Throw',
+            title=title,
             description=message
         )
         embed.set_image(url='attachment://image.png')
-        await ctx.respond(embed=embed, file=image)
+        await ctx.respond(embed=embed, file=image,view=view)
 
     @commands.slash_command(description='Whack')
     async def whack(self, ctx, target: discord.User):
         self.bot.file_manager.check_member(str(ctx.author.id))
         self.bot.file_manager.check_member(str(target.id))
 
+        if not self.check_channel(ctx.channel.name):
+            await ctx.respond("Go to the battle arena channel, you nerd!")
+            return
+        
         if ctx.author.id == target.id:
             await ctx.respond("You can't whack yourself, you dingus!")
             return
 
-        if not self.check_channel(ctx.channel.name):
-            await ctx.respond("Go to the battle arena channel, you nerd!")
-            return
+        title = 'Whack!'
+        view = None
+        if not self.check_cooldown(str(ctx.author.id)):
+            title = "Oops! How embarassing!"
+            message = f"Sorry <@{ctx.author.id}>, you've already used up all your actions this round. Wait yoyur turn!\n\nTry again in 30 seconds."
+            image = discord.File('./whackfail.jpg', filename='image.png')
 
-        rng = self.pvp()
-        if rng == -1:
-            message = f'<@{ctx.author.id}> tried to whack <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. Your attack misses completely!'
-            image = discord.File('./whackfail.jpg', filename='image.png')
-        elif rng == 0:
-            message = f"<@{ctx.author.id}> tried to whack <@{target.id}> but failed miserably!"
-            image = discord.File('./whackfail.jpg', filename='image.png')
-        elif rng == 1:
-            message = f'<@{ctx.author.id}> whacked <@{target.id}>. Ouch!'
-            image = discord.File('./knight.jpg', filename='image.png')
-        elif rng == 2:
-            coupons = random.randint(100,500)
-            message = f"<@{ctx.author.id}> whacked <@{target.id}> swith a sword and because you dealt such an epic blow, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
-            image = discord.File('./knight.jpg', filename='image.png')
-            view = PVPView(self.bot, target, coupons)
-            embed = discord.Embed(
-                title='Whack!',
-                description=message
-            )
-            embed.set_image(url='attachment://image.png')
-            await ctx.respond(embed=embed, file=image, view=view)
-            return
+        else:
+            rng = self.pvp()
+            if rng == -1:
+                message = f'<@{ctx.author.id}> tried to whack <@{target.id}>, but <@{target.id}> rolled a nat 20 saving throw. Your attack misses completely!'
+                image = discord.File('./whackfail.jpg', filename='image.png')
+            elif rng == 0:
+                message = f"<@{ctx.author.id}> tried to whack <@{target.id}> but failed miserably!"
+                image = discord.File('./whackfail.jpg', filename='image.png')
+            elif rng == 1:
+                message = f'<@{ctx.author.id}> whacked <@{target.id}>. Ouch!'
+                image = discord.File('./knight.jpg', filename='image.png')
+            elif rng == 2:
+                coupons = random.randint(100,500)
+                message = f"<@{ctx.author.id}> whacked <@{target.id}> swith a sword and because you dealt such an epic blow, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
+                image = discord.File('./knight.jpg', filename='image.png')
+                view = PVPView(self.bot, target, coupons)
 
         embed = discord.Embed(
-            title='Whack!',
+            title=title',
             description=message
         )
         embed.set_image(url='attachment://image.png')
-        await ctx.respond(embed=embed, file=image)
+        await ctx.respond(embed=embed, file=image, view = view)
+
 def setup(bot):
     bot.add_cog(DNE(bot))
