@@ -257,7 +257,7 @@ class DNE(commands.Cog):
                 view = PVPView(self.bot, target, coupons)
 
         embed = discord.Embed(
-            title=title',
+            title=title,
             description=message
         )
         embed.set_image(url='attachment://image.png')
