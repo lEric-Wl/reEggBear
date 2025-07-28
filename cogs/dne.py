@@ -4,7 +4,7 @@ import datetime
 import time
 
 import random
-    
+
 class View(discord.ui.View):
     def __init__(self,bot,monster):
         super().__init__(timeout=None)
@@ -16,33 +16,36 @@ class View(discord.ui.View):
     async def attack(self, button, interaction):        
         #await interaction.response.defer()
         self.bot.file_manager.load_saves() #Makes sure the file is ready
+
         message = str(interaction.message.id)
         if message not in self.bot.file_manager.saves['dne']['monsters']: #Adds monster to the file if it is new
-            self.bot.file_manager.saves['dne']['monsters'][message] = random.randint(1200,1750) 
+            
+            self.bot.file_manager.saves['dne']['monsters'][message] = [random.randint(1200,1750),{}]
             self.bot.file_manager.save_saves() #Saves it. Save saves also reloads the file
 
+        save = self.bot.file_manager.saves['dne']['monsters'][message]
         timestamp = int(time.time())
         member = str(interaction.user.id)
         attack = random.randint(150, 250)
         coupons = random.randint(100, 250)
 
         self.bot.file_manager.check_member(member)
-        timer = self.bot.file_manager.saves['timer']['dne']
+        timer = save[1]
 
         if member not in timer or timer[member] <= timestamp:
-            print('attacked')
-            self.bot.file_manager.saves['timer']['dne'][member] = timestamp + 900 #15 min
-            self.bot.file_manager.saves['dne']['monsters'][message] -= attack
+            print('attacked',message,save)
+            self.bot.file_manager.saves['dne']['monsters'][message][1][member] = timestamp + 900 #15 min
+            self.bot.file_manager.saves['dne']['monsters'][message][0] -= attack
             self.bot.file_manager.saves['members'][member][0] += coupons
             await interaction.response.send_message(f'Glory be! <@{member}> smote the {self.monster} for {attack} HP, and gained {coupons} coupons!')
 
-            if self.bot.file_manager.saves['dne']['monsters'][message] <= 0:
+            if self.bot.file_manager.saves['dne']['monsters'][message][0] <= 0:
                 self.bot.file_manager.saves['members'][member][0] += 500
                 await interaction.followup.send(f'Huzzah! The {self.monster} has been vanquished by <@{member}>! For dealing the final blow, <@{member}> has earned an additional 500 coupons.')
                 del self.bot.file_manager.saves['dne']['monsters'][message]
                 await interaction.message.delete()
         else:
-            await interaction.response.send_message(f"You're still on cooldown. Try again in <t:{self.bot.file_manager.saves['timer']['dne'][member]}:R>",ephemeral=True)
+            await interaction.response.send_message(f"You're still on cooldown. Try again in <t:{timer[member]}:R>",ephemeral=True)
             print('failed')
         self.bot.file_manager.save_saves()
         return
@@ -81,7 +84,7 @@ class DNE(commands.Cog):
         self.bot.add_view(PVPView(self.bot,None,None))  
 
     @tasks.loop(time=[
-        datetime.time(hour=5, minute=0, tzinfo=datetime.timezone.utc),
+        datetime.time(hour=18, minute=27, tzinfo=datetime.timezone.utc),
         datetime.time(hour=13, minute=0, tzinfo=datetime.timezone.utc),
         datetime.time(hour=21, minute=0, tzinfo=datetime.timezone.utc)
     ])
