@@ -15,6 +15,8 @@ class Counting(commands.Cog):
         if 'counting' not in message.channel.name:
             return
         
+        self.bot.file_manager.saves.setdefault('counting', [0, None])
+
         if message.author.id == self.bot.file_manager.saves['counting'][1]:
             await message.send("You can't count twice in a row, dingus!")
             self.bot.file_manager.saves['counting'] = [0, None]
@@ -34,7 +36,6 @@ class Counting(commands.Cog):
             if response.status_code != 200:
                 return
             print(response.text)
-            print('testing')
 
         self.bot.save_saves()
 
