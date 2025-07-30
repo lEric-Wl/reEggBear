@@ -17,8 +17,10 @@ class Counting(commands.Cog):
         
         print(self.bot.file_manager.saves.setdefault('counting', [0, None]))
         
-        if message.author.id == self.bot.file_manager.saves['counting'][1]:
-            await message.channel.send("You can't count twice in a row, dingus!")
+        count = self.bot.file_manager.saves['counting'][0]
+        prev = self.bot.file_manager.saves['counting'][1]
+        if message.author.id == prev:
+            await message.channel.send(f"<@{message.author.id}> ruined it at **{count}**. You can't count twice in a row!\n\nThe next number is **1**")
             await message.add_reaction('❌')
             self.bot.file_manager.saves['counting'] = [0, None]
             self.bot.file_manager.save_saves()
@@ -26,12 +28,12 @@ class Counting(commands.Cog):
 
         if message.content.isdigit():
             number = int(message.content)
-            if number == self.bot.file_manager.saves['counting'][0] + 1:
+            if number == count + 1:
                 self.bot.file_manager.saves['counting'] = [number,message.author.id]  
                 await message.add_reaction('✅')
             else:
                 await message.add_reaction('❌')
-                await message.channel.send(f"Wrong number! The next number should be {self.bot.file_manager.saves['counting'][0] + 1}.")
+                await message.channel.send(f"<@{message.author.id}> ruined it at **{count}**. Wrong number!\n\nThe next number is **1**")
                 self.bot.file_manager.saves['counting'] = [0, None]
         else:
             response = requests.get("httpsd://api.mathjs.org/v4/", params={"expr": message.content})
@@ -40,12 +42,12 @@ class Counting(commands.Cog):
             if not response.text.isdigit():
                 return 
             number = int(response.text)
-            if number == self.bot.file_manager.saves['counting'][0] + 1:
+            if number == count + 1:
                 self.bot.file_manager.saves['counting'] = [number,message.author.id]  
                 await message.add_reaction('✅')
             else:
                 await message.add_reaction('❌')
-                await message.channel.send(f"Wrong number! The next number should be {self.bot.file_manager.saves['counting'][0] + 1}.")
+                await message.channel.send(f"<@{message.author.id}> ruined it at **{count}**. Wrong number!\n\nThe next number is **1**")
                 self.bot.file_manager.saves['counting'] = [0, None]
             
         self.bot.file_manager.save_saves()
