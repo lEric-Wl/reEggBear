@@ -15,7 +15,7 @@ class Counting(commands.Cog):
         if 'counting' not in message.channel.name:
             return
         
-        self.bot.file_manager.saves.setdefault('counting', [0, None])
+        print(self.bot.file_manager.saves)
 
         if message.author.id == self.bot.file_manager.saves['counting'][1]:
             await message.send("You can't count twice in a row, dingus!")
