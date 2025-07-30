@@ -36,7 +36,7 @@ class Counting(commands.Cog):
                 await message.channel.send(f"<@{message.author.id}> ruined it at **{count}**. Wrong number!\n\nThe next number is **1**")
                 self.bot.file_manager.saves['counting'] = [0, None]
         else:
-            response = requests.get("https://api.mathjs.org/v4/", params={"expr": message.content})
+            response = requests.get("https://api.mathjs.org/v4/", params={"expr": message.content.lower()})
             if response.status_code != 200:
                 return
             if not response.text.isdigit():
