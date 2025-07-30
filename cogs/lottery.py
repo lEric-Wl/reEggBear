@@ -79,9 +79,9 @@ class Lottery(commands.Cog):
             title='Egg Bear Lottery!',
             description=f'''Enter to win some Hello Fresh coupons!
 
-            Each ticket costs 100 coupons. Winners will be selected every day at 18:00 UTC +0.
-                    
-            The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['total']} coupons!**
+Each ticket costs 100 coupons. Winners will be selected every day at 18:00 UTC +0.
+                
+The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['total']} coupons!**
             '''
             )
 
