@@ -62,7 +62,6 @@ class PVPView(discord.ui.View):
     @discord.ui.button(label="Grab Coupons!", style=discord.ButtonStyle.green, custom_id="attack")
     async def take(self,button,interaction):
         self.bot.file_manager.check_member(str(interaction.user.id))
-        print('target',self.target.id)
         self.bot.file_manager.check_member(str(self.target.id))
 
         self.bot.file_manager.saves['members'][str(self.target.id)][0] -= self.coupons
