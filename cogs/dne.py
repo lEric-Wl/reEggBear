@@ -143,6 +143,13 @@ class DNE(commands.Cog):
             await ctx.respond("Go to the battle arena channel, you nerd!")
             return
         
+        if target.is_bot:
+            fine = random.randint(100,300)
+            await ctx.respond(f"How dare you try to rizz a bot! Gimme {fine} of your coupons, dingus!")
+            self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
+            self.bot.file_manager.save_saves()
+            return    
+            
         if ctx.author.id == target.id:
             await ctx.respond("You can't rizz yourself, you dingus!")
             return
@@ -184,6 +191,13 @@ class DNE(commands.Cog):
         if not self.check_channel(ctx.channel.name):
             await ctx.respond("Go to the battle arena channel, you nerd!")
             return
+        
+        if target.is_bot:
+            fine = random.randint(100,300)
+            await ctx.respond(f"How dare you try to fireball a bot! Gimme {fine} of your coupons, dingus!")
+            self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
+            self.bot.file_manager.save_saves()
+            return 
         
         if ctx.author.id == target.id:
             await ctx.respond("You can't fireball yourself, you dingus!")
@@ -227,6 +241,13 @@ class DNE(commands.Cog):
         if not self.check_channel(ctx.channel.name):
             await ctx.respond("Go to the battle arena channel, you nerd!")
             return
+        
+        if target.is_bot:
+            fine = random.randint(100,300)
+            await ctx.respond(f"How dare you try to whack a bot! Gimme {fine} of your coupons, dingus!")
+            self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
+            self.bot.file_manager.save_saves()
+            return 
         
         if ctx.author.id == target.id:
             await ctx.respond("You can't whack yourself, you dingus!")
