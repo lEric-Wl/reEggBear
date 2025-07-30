@@ -15,7 +15,7 @@ class Counting(commands.Cog):
         if 'counting' not in message.channel.name:
             return
         
-        print(self.bot.file_manager.saves)
+        print(self.bot.file_manager.saves.setdefault('counting', [0, None]))
 
         if message.author.id == self.bot.file_manager.saves['counting'][1]:
             await message.send("You can't count twice in a row, dingus!")
@@ -31,13 +31,11 @@ class Counting(commands.Cog):
                 await message.channel.send(f"Wrong number! The next number should be {self.bot.file_manager.saves['counting'][0] + 1}.")
                 self.bot.file_manager.saves['counting'] = [0, None]
         else:
-            url = f"https://api.mathjs.org/v4/?expr={message.content}"
-            response = requests.get(url)
-            if response.status_code != 200:
+            try:
+                print(eval(message.content))
+            except Exception as e:
                 return
-            print(response.text)
-
-        self.bot.save_saves()
+        self.bot.file_manager.save_saves()
 
 def setup(bot):
     bot.add_cog(Counting(bot))

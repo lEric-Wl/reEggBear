@@ -87,6 +87,7 @@ async def update_code(ctx, cogs=False, stash=False):
                 subprocess.run(['git','add',stuff])
         if stash:
             subprocess.run(['git', 'stash'])
+            
         subprocess.run(["git", "pull"])
         await ctx.respond('Code pulled from github', ephemeral=True)
     except Exception as e:
