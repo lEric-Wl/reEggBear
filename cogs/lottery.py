@@ -74,15 +74,15 @@ class Lottery(commands.Cog):
     @commands.slash_command(description="Enter the lottery!")
     async def lottery(self, ctx):
         thumbnail = discord.File('./gamblingMeme.jpeg',filename='image.jpeg')
-
+    
         embed = discord.Embed(
             title='Egg Bear Lottery!',
             description=f'''Enter to win some Hello Fresh coupons!
 
-                Each ticket costs 100 coupons. Winners will be selected every day at 18:00 UTC +0.
+            Each ticket costs 100 coupons. Winners will be selected every day at 18:00 UTC +0.
                     
-                The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['total']} coupons!**
-                    '''
+            The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['total']} coupons!**
+            '''
             )
 
         embed.set_thumbnail(url='attachment://image.jpeg')
