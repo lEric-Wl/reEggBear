@@ -34,6 +34,7 @@ class Counting(commands.Cog):
             if response.status_code != 200:
                 return
             print(response.text)
+            print('testing')
 
         self.bot.save_saves()
 
