@@ -19,6 +19,7 @@ class Counting(commands.Cog):
         
         if message.author.id == self.bot.file_manager.saves['counting'][1]:
             await message.channel.send("You can't count twice in a row, dingus!")
+            await message.add_reaction('❌')
             self.bot.file_manager.saves['counting'] = [0, None]
 
         if message.content.isdigit():
