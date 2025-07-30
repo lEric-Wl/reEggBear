@@ -7,7 +7,7 @@ from os.path import exists
 
 if not exists('saves.json'):
     with open('saves.json', 'w') as saves:
-        json.dump({'members': {}, 'lottery': {},'timer':{"daily":{},"pvp":{}},'dne':{"monsters"}}, saves, indent=4)
+        json.dump({'members': {}, 'lottery': {},'timer':{"daily":{},"pvp":{}},'dne':{"monsters":{}},'counting':[0,0]}, saves, indent=4)
 
 with open('creds.json', 'r') as creds_file:
     creds = json.load(creds_file)
