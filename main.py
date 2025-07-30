@@ -77,14 +77,15 @@ async def reload(ctx, extension=None):
 
 
 @bot.command(description='Not for you to use')
-async def update_code(ctx, full_update=False):
+async def update_code(ctx, cogs=False, stash=False):
     if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         await ctx.respond('Hands off, dingus!')
         return 
     try:
-        if full_update:
+        if cogs:
             for stuff in allCogs:
                 subprocess.run(['git','add',stuff])
+        if stash:
             subprocess.run(['git', 'stash'])
         subprocess.run(["git", "pull"])
         await ctx.respond('Code pulled from github', ephemeral=True)
