@@ -1,11 +1,13 @@
 import discord
 import json
+import subprocess
+import sys
 import os
 from os.path import exists
 
 if not exists('saves.json'):
     with open('saves.json', 'w') as saves:
-        json.dump({'members': {}, 'lottery': {},'timer':{"daily":{},"dne":{}},'dne':{}}, saves, indent=4)
+        json.dump({'members': {}, 'lottery': {},'timer':{"daily":{},"pvp":{}},'dne':{"monsters"}}, saves, indent=4)
 
 with open('creds.json', 'r') as creds_file:
     creds = json.load(creds_file)
@@ -14,7 +16,7 @@ discordToken = creds['discordToken']
 
 intent = discord.Intents.all()
 bot = discord.Bot(intents=intent)
-allCogs = ['lottery', 'econ', 'dne']
+allCogs = ['lottery', 'econ', 'dne','counting']
 
 @bot.event
 async def on_ready():
@@ -56,7 +58,7 @@ bot.file_manager = FileManager(bot)
 @bot.command(description='Not for you to use')
 async def reload(ctx, extension=None):
     await ctx.defer(ephemeral=True)
-    if not await bot.is_owner(ctx.author):
+    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
         print(f"{ctx.author} tried to use the reload command")
         await ctx.respond('I told you in the description this is not for you to use, you Dingus!')
         return
@@ -73,18 +75,27 @@ async def reload(ctx, extension=None):
     except Exception as e:
         await ctx.respond(f"Unexpected error: {str(e)}", ephemeral=True)
 
-'''
+
 @bot.command(description='Not for you to use')
-async def reload(ctx, extension=None):
-    await ctx.defer(ephemeral=True)
-    if not await bot.is_owner(ctx.author):
-        print(f"{ctx.author} tried to use the reload command")
-        await ctx.respond('I told you in the description this is not for you to use, you Dingus!')
-        return
+async def update_code(ctx):
+    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
+        await ctx.respond('Hands off, dingus!')
+        return 
     try:
-        
-        if extension is not None:
-'''
+        subprocess.run(["git", "pull"])
+        await ctx.respond('Code pulled from github', ephemeral=True)
+    except Exception as e:
+        await ctx.respond(f"Error: {str(e)}", ephemeral=True)
+
+@bot.command(description="This will restart the bot. Don't use unless main.py has been updated")
+async def restart(ctx):
+    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
+        await ctx.respond('Hands off, dingus!')
+        return
+    await ctx.respond('Restarting bot...', ephemeral=True)
+    python = sys.executable
+    os.execl(python,python,*sys.argv)
+
 
 @bot.command()
 async def ping(ctx):
