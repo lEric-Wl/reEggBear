@@ -77,12 +77,12 @@ async def reload(ctx, extension=None):
 
 
 @bot.command(description='Not for you to use')
-async def update_code(ctx, fullUpdate=False):
+async def update_code(ctx, full_update=False):
     if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         await ctx.respond('Hands off, dingus!')
         return 
     try:
-        if fullUpdate:
+        if full_update:
             for stuff in allCogs:
                 subprocess.run(['git','add',stuff])
             subprocess.run(['git', 'stash'])
@@ -95,6 +95,15 @@ async def update_code(ctx, fullUpdate=False):
 async def restart(ctx):
     if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         await ctx.respond('Hands off, dingus!')
+        return
+    # Check for syntax errors
+    result = subprocess.run(
+        [sys.executable, "-m", "py_compile", "main.py"],
+        capture_output=True,
+        text=True
+    )
+    if result.returncode != 0:
+        await ctx.respond(f"Syntax error detected:\n```{result.stderr}```", ephemeral=True)
         return
     await ctx.respond('Restarting bot...', ephemeral=True)
     python = sys.executable
