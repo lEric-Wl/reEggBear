@@ -16,9 +16,9 @@ class Counting(commands.Cog):
             return
         
         print(self.bot.file_manager.saves.setdefault('counting', [0, None]))
-
+        
         if message.author.id == self.bot.file_manager.saves['counting'][1]:
-            await message.send("You can't count twice in a row, dingus!")
+            await message.channel.send("You can't count twice in a row, dingus!")
             self.bot.file_manager.saves['counting'] = [0, None]
 
         if message.content.isdigit():
