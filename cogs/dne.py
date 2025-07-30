@@ -143,7 +143,7 @@ class DNE(commands.Cog):
             return
         
         if target.is_bot:
-            fine = random.randint(100,300)
+            fine = int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0])
             await ctx.respond(f"How dare you try to rizz a bot! Gimme {fine} of your coupons, dingus!")
             self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
             self.bot.file_manager.save_saves()
@@ -170,7 +170,7 @@ class DNE(commands.Cog):
                 message = f'<@{ctx.author.id}> rizzed <@{target.id}>. What a simp!'
                 image = discord.File('./chad.jpg', filename='image.png')
             elif rng == 2:
-                coupons = random.randint(100,500)
+                coupons = min(int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0]), random.randint(100,500))
                 message = f"<@{ctx.author.id}> rizzed <@{target.id}> and because they're such a simp they tossed {coupons} of their Hello Fresh coupons at your feet; quick pick it up!"
                 image = discord.File('./chad.jpg', filename='image.png')
                 view = PVPView(self.bot, target, coupons)
@@ -192,7 +192,7 @@ class DNE(commands.Cog):
             return
         
         if target.is_bot:
-            fine = random.randint(100,300)
+            fine = int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0])
             await ctx.respond(f"How dare you try to fireball a bot! Gimme {fine} of your coupons, dingus!")
             self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
             self.bot.file_manager.save_saves()
@@ -220,7 +220,7 @@ class DNE(commands.Cog):
                 message = f'<@{ctx.author.id}> hit <@{target.id}> with a fireball. Good shot!'
                 image = discord.File('./gandalf.jpg', filename='image.png')
             elif rng == 2:
-                coupons = random.randint(100,500)
+                coupons = min(int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0]), random.randint(100,500))
                 message = f"<You fireballed <@{target.id}> and because you threw such an epic shot, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
                 image = discord.File('./gandalf.jpg', filename='image.png')
                 view = PVPView(self.bot, target, coupons)
@@ -242,7 +242,7 @@ class DNE(commands.Cog):
             return
         
         if target.is_bot:
-            fine = random.randint(100,300)
+            fine = int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0])
             await ctx.respond(f"How dare you try to whack a bot! Gimme {fine} of your coupons, dingus!")
             self.bot.file_manager.saves['members'][str(ctx.author.id)][0] -= fine
             self.bot.file_manager.save_saves()
@@ -271,7 +271,7 @@ class DNE(commands.Cog):
                 message = f'<@{ctx.author.id}> whacked <@{target.id}>. Ouch!'
                 image = discord.File('./knight.jpg', filename='image.png')
             elif rng == 2:
-                coupons = random.randint(100,500)
+                coupons = min(int((random.randint(1, 5)/100) * self.bot.file_manager.saves['members'][str(ctx.author.id)][0]), random.randint(100,500))
                 message = f"<@{ctx.author.id}> whacked <@{target.id}> swith a sword and because you dealt such an epic blow, they dropped {coupons} of their Hello Fresh coupons; quick pick it up!"
                 image = discord.File('./knight.jpg', filename='image.png')
                 view = PVPView(self.bot, target, coupons)
