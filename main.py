@@ -58,7 +58,7 @@ bot.file_manager = FileManager(bot)
 @bot.command(description='Not for you to use')
 async def reload(ctx, extension=None):
     await ctx.defer(ephemeral=True)
-    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
+    if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         print(f"{ctx.author} tried to use the reload command")
         await ctx.respond('I told you in the description this is not for you to use, you Dingus!')
         return
@@ -78,7 +78,7 @@ async def reload(ctx, extension=None):
 
 @bot.command(description='Not for you to use')
 async def update_code(ctx):
-    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
+    if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         await ctx.respond('Hands off, dingus!')
         return 
     try:
@@ -89,7 +89,7 @@ async def update_code(ctx):
 
 @bot.command(description="This will restart the bot. Don't use unless main.py has been updated")
 async def restart(ctx):
-    if not ctx.author.guild_permission.administrator or not await bot.is_owner(ctx.author):
+    if not ctx.author.guild_permissions.administrator or not await bot.is_owner(ctx.author):
         await ctx.respond('Hands off, dingus!')
         return
     await ctx.respond('Restarting bot...', ephemeral=True)
@@ -106,4 +106,6 @@ for stuff in allCogs:
     bot.load_extension(f'cogs.{stuff}')    
 
 bot.run(discordToken)
+
+
 
