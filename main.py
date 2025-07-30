@@ -89,7 +89,7 @@ async def update_code(ctx, cogs:bool=False, stash:bool=False):
             subprocess.run(['git', 'stash'])
 
         run = subprocess.run(["git", "pull"],capture_output=True, text=True)
-        await ctx.respond(f'{run.stdout}\n\nr{run.stderr}', ephemeral=True)
+        await ctx.respond(f'{run.stdout}\n\n{run.stderr}', ephemeral=True)
     except Exception as e:
         await ctx.respond(f"Error: {str(e)}", ephemeral=True)
 
