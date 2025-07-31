@@ -84,6 +84,10 @@ class DNE(commands.Cog):
         self.bot.add_view(View(self.bot,None))
         self.bot.add_view(PVPView(self.bot,None,None))  
 
+    @commands.Cog.listener()
+    def cog_unload(self):
+        self.monster.cancel()
+
     @tasks.loop(time=[
         datetime.time(hour=5, minute=0, tzinfo=datetime.timezone.utc),
         datetime.time(hour=13, minute=0, tzinfo=datetime.timezone.utc),

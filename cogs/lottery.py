@@ -71,6 +71,10 @@ class Lottery(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(View(self.bot))
 
+    @commands.Cog.listener()
+    def cog_unload(self):
+        self.get_winner.cancel()
+
     @commands.slash_command(description="Enter the lottery!")
     async def lottery(self, ctx):
         thumbnail = discord.File('./gamblingMeme.jpeg',filename='image.jpeg')
