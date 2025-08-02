@@ -118,12 +118,10 @@ async def ping(ctx):
     await ctx.respond(f"Pong! Latency is {bot.latency}")
     print("recived")
 
-async def startup(bot):
-    for stuff in allCogs:
-        await bot.load_extension(f'{stuff}')   
-    await bot.start(discordToken)
 
-asyncio.run(startup(bot)) 
+for stuff in allCogs:
+    bot.load_extension(f'{stuff}')   
+bot.run(discordToken)
 
 
 

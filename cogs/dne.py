@@ -287,4 +287,4 @@ class DNE(commands.Cog):
         await ctx.respond(embed=embed, file=image, view = view)
 
 async def setup(bot):
-    await bot.add_cog(DNE(bot))
+    bot.add_cog(DNE(bot))

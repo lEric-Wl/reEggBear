@@ -141,4 +141,4 @@ The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['t
         
 
 async def setup(bot):
-    await bot.add_cog(Lottery(bot))
+    bot.add_cog(Lottery(bot))
