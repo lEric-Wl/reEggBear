@@ -4,6 +4,7 @@ import subprocess
 import sys
 import os
 from os.path import exists
+import asyncio
 
 if not exists('saves.json'):
     with open('saves.json', 'w') as saves:
@@ -64,10 +65,10 @@ async def reload(ctx, extension=None):
         return
     try:
         if extension is not None:
-            bot.reload_extension(f'cogs.{extension}')
+            await bot.reload_extension(f'cogs.{extension}')
         else:
             for stuff in allCogs:
-                bot.reload_extension(f'cogs.{stuff}')
+                await bot.reload_extension(f'cogs.{stuff}')
         print("\n\n\n\n\n\n\n\n\n\nreloaded")
         await ctx.respond('Done', ephemeral=True)
     except discord.ExtensionError as e:
@@ -84,7 +85,7 @@ async def update_code(ctx, cogs:bool=False, stash:bool=False):
     try:
         if cogs:
             for stuff in allCogs:
-                subprocess.run(['git','add',stuff])
+                subprocess.run(['git','add',f'cogs/{stuff}'])
         if stash:
             subprocess.run(['git', 'stash'])
 
@@ -117,10 +118,13 @@ async def ping(ctx):
     await ctx.respond(f"Pong! Latency is {bot.latency}")
     print("recived")
 
-for stuff in allCogs:
-    bot.load_extension(f'cogs.{stuff}')    
+async def startup(bot):
+    for stuff in allCogs:
+        await bot.load_extension(f'{stuff}')   
+    await bot.start(discordToken)
 
-bot.run(discordToken)
+asyncio.run(startup(bot)) 
+
 
 
 

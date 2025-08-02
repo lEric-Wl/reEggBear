@@ -71,7 +71,6 @@ class Lottery(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(View(self.bot))
 
-    @commands.Cog.listener()
     def cog_unload(self):
         self.get_winner.cancel()
 
@@ -141,5 +140,5 @@ The current jackpot is **{1000 + 100 * self.bot.file_manager.saves['lottery']['t
         await channel.send(embed=embed,file=image)            
         
 
-def setup(bot):
-    bot.add_cog(Lottery(bot))
+async def setup(bot):
+    await bot.add_cog(Lottery(bot))

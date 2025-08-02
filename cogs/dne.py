@@ -84,12 +84,11 @@ class DNE(commands.Cog):
         self.bot.add_view(View(self.bot,None))
         self.bot.add_view(PVPView(self.bot,None,None))  
 
-    @commands.Cog.listener()
     def cog_unload(self):
         self.monster.cancel()
 
     @tasks.loop(time=[
-        datetime.time(hour=5, minute=0, tzinfo=datetime.timezone.utc),
+        datetime.time(hour=15, minute=14, tzinfo=datetime.timezone.utc),
         datetime.time(hour=13, minute=0, tzinfo=datetime.timezone.utc),
         datetime.time(hour=21, minute=0, tzinfo=datetime.timezone.utc)
     ])
@@ -287,5 +286,5 @@ class DNE(commands.Cog):
         embed.set_image(url='attachment://image.png')
         await ctx.respond(embed=embed, file=image, view = view)
 
-def setup(bot):
-    bot.add_cog(DNE(bot))
+async def setup(bot):
+    await bot.add_cog(DNE(bot))

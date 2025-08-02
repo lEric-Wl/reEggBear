@@ -163,6 +163,6 @@ class Economy(commands.Cog):
         await ctx.respond(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Economy(bot))
+async def setup(bot):
+    await bot.add_cog(Economy(bot))
     

@@ -52,5 +52,5 @@ class Counting(commands.Cog):
             
         self.bot.file_manager.save_saves()
 
-def setup(bot):
-    bot.add_cog(Counting(bot))
+async def setup(bot):
+    await bot.add_cog(Counting(bot))
